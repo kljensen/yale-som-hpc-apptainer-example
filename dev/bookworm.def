@@ -1,0 +1,52 @@
+Bootstrap: docker
+From: golang:1.23-bookworm
+
+%post
+    # Disable apt sandboxing for Apptainer build compatibility
+    echo 'APT::Sandbox::User "root";' > /etc/apt/apt.conf.d/99sandboxroot
+
+    # Update and install minimal development tools
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        git \
+        make \
+        curl \
+        ca-certificates \
+        nodejs \
+        npm \
+        python3 \
+        python3-pip \
+        locales \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Configure locale to prevent warnings
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+    locale-gen en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
+
+    # Set up Go environment
+    go env -w GO111MODULE=on
+
+    # Install global npm packages for AI development tools
+    npm install -g \
+        @anthropic-ai/claude-code \
+        @github/copilot \
+        @google/gemini-cli \
+        @openai/codex
+
+    # Install uv (fast Python package installer)
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+%environment
+    export PATH=/root/.cargo/bin:/usr/local/go/bin:/go/bin:$PATH
+    export GOPATH=/go
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+
+%runscript
+    exec /bin/bash "$@"
+
+%labels
+    Author kljensen
+    Version 2.1
+    Description Go + Node.js development environment with multiple AI coding assistants (Claude Code, GitHub Copilot, OpenAI, Gemini) based on Debian Bookworm
