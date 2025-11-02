@@ -130,12 +130,6 @@ Once inside the container (after `just apptainer shell-slurm`), you can run Clau
 ```bash
 # Run Claude Code with full autonomy (no permission prompts)
 claude --dangerously-skip-permissions
-
-# Or run with a specific prompt
-claude --dangerously-skip-permissions "Refactor this Go code to use goroutines"
-
-# Check Claude Code version
-claude --version
 ```
 
 **Why `--dangerously-skip-permissions`?**
@@ -154,7 +148,7 @@ The container includes multiple AI coding assistants. Test them all:
 
 ```bash
 # GitHub Copilot
-gh copilot suggest "write a function to parse CSV"
+copilot
 
 # OpenAI Codex
 codex "generate unit tests for main.go"
@@ -162,24 +156,6 @@ codex "generate unit tests for main.go"
 # Google Gemini CLI
 gemini chat
 ```
-
-### Working with Your Code
-
-Your current directory is automatically mounted at `/workspace` inside the container:
-
-```bash
-# Before entering container
-cd ~/my-project
-
-# Enter container
-just apptainer shell-slurm
-
-# Inside container - you're in /workspace which maps to ~/my-project
-ls  # Shows your project files
-claude --dangerously-skip-permissions
-```
-
----
 
 ## Configuration
 
@@ -246,6 +222,8 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@yale.edu"
 ```
 
+Alternatively, AI can likely help you mount just the files/dirs from you `$HOME` that you want.
+
 </details>
 
 ---
@@ -278,131 +256,3 @@ git config --global user.email "your.email@yale.edu"
 - **Locale**: `en_US.UTF-8`
 - **Working Directory**: `/workspace` (bound to your current directory)
 
----
-
-## Advanced Usage
-
-### Building Locally (Without SLURM)
-
-```bash
-# Build the container on the login node
-just apptainer build
-
-# Launch shell without SLURM (for quick tests)
-just apptainer shell
-```
-
-### Running Commands Directly
-
-```bash
-# Run a single command in the container
-just apptainer run "go version"
-
-# Run via SLURM with custom resources
-just apptainer run-slurm "npm install" 8 16G
-```
-
-### Testing the Container
-
-```bash
-# Verify all tools are installed correctly
-just apptainer test
-```
-
-Expected output:
-```
-Go: go version go1.23.x linux/amd64
-Node.js: v20.x.x
-npm: 10.x.x
-Git: git version 2.39.x
-Claude Code: @anthropic-ai/claude-code@x.x.x
-...
-```
-
-### Inspecting Container Metadata
-
-```bash
-# View container labels and environment
-just apptainer info
-```
-
----
-
-## Troubleshooting
-
-<details>
-<summary><b>Build fails with "fchown" errors</b></summary>
-
-This is a known issue with Apptainer's fakeroot environment. The current container definition includes workarounds (`--no-same-owner` flags) that should prevent this. If you still encounter issues, ensure you're using Apptainer 1.4.1 or later:
-
-```bash
-module load apptainer/1.4.1-nkna
-```
-</details>
-
-<details>
-<summary><b>Claude Code says "command not found"</b></summary>
-
-The PATH may not be set correctly. Inside the container, manually source nvm:
-
-```bash
-export NVM_DIR="/root/.nvm"
-source "$NVM_DIR/nvm.sh"
-claude --version
-```
-
-If this works, the issue is with the container's `%environment` section. Please open an issue.
-</details>
-
-<details>
-<summary><b>SLURM job won't start</b></summary>
-
-Check the queue and your resource request:
-
-```bash
-squeue -u $USER  # View your jobs
-sinfo            # View cluster status
-```
-
-Try requesting fewer resources:
-```bash
-just apptainer shell-slurm 2 8G
-```
-</details>
-
----
-
-## Contributing
-
-Contributions are welcome! If you'd like to:
-
-- 🐛 Report bugs
-- 💡 Suggest new features
-- 🔧 Submit improvements to the container definition
-- 📖 Improve documentation
-
-Please open an issue or pull request on GitHub.
-
----
-
-## License
-
-This project is provided as-is for educational and research purposes at Yale SOM. Feel free to adapt and modify for your needs.
-
-**Author**: [Kyle Jensen](https://github.com/kljensen)
-**Institution**: Yale School of Management
-
----
-
-## Acknowledgments
-
-- Built with [Apptainer](https://apptainer.org/) (formerly Singularity)
-- Task automation powered by [just](https://github.com/casey/just)
-- AI tools by Anthropic, GitHub, Google, and OpenAI
-- Container base image from the official [Go Docker images](https://hub.docker.com/_/golang)
-
----
-
-**Happy coding with AI! 🤖✨**
-
-For questions or support, contact Yale SOM HPC support or open an issue on this repository.
