@@ -23,40 +23,20 @@ build() {
     echo "Build complete: $SIF_IMAGE"
 }
 
-# Start interactive shell in container
+# Start interactive shell in container via SLURM
 shell() {
     load_apptainer
     if [ ! -f "$SIF_IMAGE" ]; then
         echo "Error: Container $SIF_IMAGE not found. Run './container.sh build' first."
         exit 1
     fi
-    echo "Starting shell in container..."
-    apptainer shell \
-        --bind "$PWD:/workspace" \
-        --bind "$HOME" \
-        --pwd /workspace \
-        "$SIF_IMAGE"
-}
-
-# Test the container
-test() {
-    load_apptainer
-    if [ ! -f "$SIF_IMAGE" ]; then
-        echo "Error: Container $SIF_IMAGE not found. Run './container.sh build' first."
-        exit 1
-    fi
-    echo "Testing container tools..."
-    apptainer exec \
-        --bind "$PWD:/workspace" \
-        --bind "$HOME" \
-        --pwd /workspace \
-        "$SIF_IMAGE" sh -c "
-        echo 'Go:' && go version
-        echo 'Node.js:' && node --version
-        echo 'npm:' && npm --version
-        echo 'Git:' && git --version
-        echo 'Claude Code:' && npm list -g @anthropic-ai/claude-code --depth=0 | grep claude-code || echo 'Not installed'
-    "
+    echo "Requesting SLURM resources: 4 CPUs, 4GB RAM..."
+    srun --cpus-per-task=4 --mem=4G --pty \
+        apptainer shell \
+            --bind "$PWD:/workspace" \
+            --bind "$HOME" \
+            --pwd /workspace \
+            "$SIF_IMAGE"
 }
 
 # Clean up container image
@@ -77,7 +57,6 @@ Usage: ./container.sh [COMMAND]
 Commands:
     build   Build the container image
     shell   Start interactive shell in container
-    test    Test the container tools
     clean   Remove the container image
     help    Show this help message
 

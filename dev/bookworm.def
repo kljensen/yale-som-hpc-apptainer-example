@@ -41,7 +41,8 @@ From: golang:1.23-bookworm
         @anthropic-ai/claude-code \
         @github/copilot \
         @google/gemini-cli \
-        @openai/codex
+        @openai/codex \
+        opencode-ai@latest
 
     # Install uv (fast Python package installer)
     # Manual installation to avoid tar ownership errors in fakeroot
