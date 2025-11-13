@@ -31,14 +31,9 @@ You can have AI adjust that container definition to fit your needs.
 
 ## Video tutorial
 
-<iframe
-  src="https://customer-nqm31gur9npo184x.cloudflarestream.com/e2a354d42cd992599ad8ae0167c59719/iframe"
-  style="border: none;"
-  height="720"
-  width="1280"
-  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-  allowfullscreen="true">
-</iframe>
+[![Watch the video tutorial](./assets/video-thumbnail.jpg)](https://customer-nqm31gur9npo184x.cloudflarestream.com/e2a354d42cd992599ad8ae0167c59719/watch)
+
+*Click the image above to watch the tutorial video*
 
 
 
